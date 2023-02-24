@@ -1,0 +1,44 @@
+@import url("../../../globalStyles/colors.scss");
+
+.wrapper {
+  width: auto;
+  height: 100%;
+  background-color: var(--white);
+  position: relative;
+  overflow-y: scroll;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 3.5rem;
+  padding-left: 16px;
+  position: sticky;
+  top: 0px;
+}
+
+.message {
+  max-width: 450px;
+  width: fit-content;
+  list-style: none;
+  border-radius: 4px 12px 12px 4px;
+  color: white;
+  background-color: var(--twitter-gray);
+  margin-top: 6px;
+  padding: 6px 14px;
+}
+
+.messagesWrapper {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  max-height: 75vh; 
+  list-style-type: none;
+  padding-inline-start: 8px;
+}
+
+.sent {
+  align-self: flex-end;
+  background-color: var(--twitter-blue);
+  border-radius: 24px 4px 4px 24px;
+}

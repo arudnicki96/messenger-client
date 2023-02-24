@@ -1,0 +1,71 @@
+.wrapper {
+    width: 100%;
+    height: 100%;
+    background-color: var(--white);
+    border-right: 1px solid var(--twitter-gray);
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.conversationItemWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 4px;
+   
+}
+
+.conversationItemWrapper:hover {
+    background-color: var(--twitter-light-gray);
+}
+.nicknameText {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: 16px;
+    overflow: hidden;
+    margin-left: 8px;
+
+    //To cover the text message going waaay too far
+}
+
+.textMessage {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+
+.nickname {
+    color: var(--twitter-gray);
+}
+
+.inputWrapper {
+    padding: 8px;
+    border-radius: 12px;
+    background-color: var(--twitter-light-gray);
+    position: relative;
+
+    svg {
+        position: absolute;
+        top: calc(50% - 12px);
+        left: 8px;
+        opacity: 0.25;
+    }
+
+    input {
+        width: 100%;
+        height: 100%;
+        background-color: var(--twitter-light-gray);
+        padding-left: 32px;
+        border: none;
+        &:focus {
+            outline: none;
+        }
+    }
+}
