@@ -4,7 +4,7 @@ import EyePasswordHide from "../../icons/EyePasswordHide";
 import EyePasswordShow from "../../icons/EyePasswordShow";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "react-query";
+import { useForm } from "react-hook-form";
 
 enum actions {
   login = "Login",
@@ -25,18 +25,27 @@ type LoginUserData = {
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [passwordConfirm, setPasswordConfirm] = useState<string>("");
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
   const [userAction, setUserAction] = useState<actions>(actions.login);
 
+  const { register, handleSubmit } = useForm();
   const passwordIcon = (
     <div onClick={() => setIsPasswordShown(!isPasswordShown)}>
       {isPasswordShown ? <EyePasswordShow /> : <EyePasswordHide />}
     </div>
   );
+
+  const loginUser = (data: LoginUserData) =>
+    axios
+      .post("/api/users/login", data)
+      .then((response) => handleAxiosSuccess(response));
+
+  const registerUser = (data: RegisterUserData) => {
+    axios
+      .post("/api/users/signup", data)
+      .then((response) => handleAxiosSuccess(response));
+  };
+
   const passwordInputType = isPasswordShown ? "text" : "password";
 
   const handleAxiosSuccess = (response) => {
@@ -51,68 +60,26 @@ const SignUp: React.FC = () => {
       navigate("/messenger");
     }
   };
-
-  const registerMutation = useMutation(
-    (data: RegisterUserData) => {
-      return axios.post("/api/users/signup", data);
-    },
-    {
-      onSuccess: (response) => {
-        handleAxiosSuccess(response);
-      },
-    }
-  );
-
-  const loginMutation = useMutation(
-    (data: LoginUserData) => {
-      return axios.post("/api/users/login", data);
-    },
-    {
-      onSuccess: (response) => handleAxiosSuccess(response),
-    }
-  );
-
-  const loginSubmit = (e) => {
-    e.preventDefault();
-    loginMutation.mutate({
-      email: email,
-      password: password,
-    });
-  };
-
-  const registerSubmit = (e) => {
-    e.preventDefault();
-    registerMutation.mutate({
-      username: username,
-      email: email,
-      password: password,
-      passwordConfirm: passwordConfirm,
-    });
-  };
   const LoginForm = (
     <div>
-      <form onSubmit={loginSubmit}>
+      <form onSubmit={handleSubmit(loginUser)}>
         <div className={styles.signUp}>
           <label htmlFor={"email"}>Email</label>
-          <input
-            type={"email"}
-            name={"email"}
-            onChange={(e) => setEmail(e.target.value)}
-          ></input>
+          <input type={"email"} name={"email"} {...register("email")}></input>
           <label htmlFor={"new-password"}>Password</label>
           <div className={styles.inputWrapper}>
             <input
               type={passwordInputType}
               autoComplete={"current-password"}
               id="current-password"
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password")}
             />
             {passwordIcon}
           </div>
         </div>
         <button
           type={"submit"}
-          onClick={loginSubmit}
+          onClick={handleSubmit(loginUser)}
           className={styles.submitButton}
         >
           {userAction}
@@ -128,19 +95,15 @@ const SignUp: React.FC = () => {
   );
 
   const SignUpForm = (
-    <form onSubmit={registerSubmit}>
+    <form onSubmit={handleSubmit(registerUser)}>
       <div className={styles.signUp}>
         <label htmlFor={"email"}>Email</label>
-        <input
-          type={"email"}
-          name={"email"}
-          onChange={(e) => setEmail(e.target.value)}
-        ></input>
+        <input type={"email"} name={"email"} {...register("email")}></input>
         <label htmlFor={"username"}>Username</label>
         <input
           type={"text"}
           name={"username"}
-          onChange={(e) => setUsername(e.target.value)}
+          {...register("username")}
         ></input>
         <label htmlFor={"new-password"}>Password</label>
         <div className={styles.inputWrapper}>
@@ -148,7 +111,7 @@ const SignUp: React.FC = () => {
             type={passwordInputType}
             autoComplete={"new-password"}
             id="new-password"
-            onChange={(e) => setPassword(e.target.value)}
+            {...register("password")}
           />
           {passwordIcon}
         </div>
@@ -157,14 +120,14 @@ const SignUp: React.FC = () => {
           <input
             type={passwordInputType}
             name={"passwordConfirm"}
-            onChange={(e) => setPasswordConfirm(e.target.value)}
+            {...register("passwordConfirm")}
           ></input>
           {passwordIcon}
         </div>
       </div>
       <button
         type={"submit"}
-        onClick={registerSubmit}
+        onClick={handleSubmit(registerUser)}
         className={styles.submitButton}
       >
         {userAction}
