@@ -4,11 +4,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUp from "./components/SignUp/SignUp";
 import Chat from "./components/Chat/Chat";
-import {
-  QueryClientProvide,
-  QueryClient,
-  QueryClientProvider,
-} from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 function App() {
   const queryClient = new QueryClient();
