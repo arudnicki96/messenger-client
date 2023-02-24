@@ -20,6 +20,6 @@
     "**/*.ts",
     "**/*.tsx",
     "src/components/SignUp/Login.jsx"
-  ],
+, "src/redux/actions/authActions.js"  ],
   "exclude": ["node_modules"]
 }

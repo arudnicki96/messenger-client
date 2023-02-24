@@ -5,6 +5,8 @@ import EyePasswordShow from "../../icons/EyePasswordShow";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store";
 
 enum actions {
   login = "Login",
@@ -40,10 +42,9 @@ const SignUp: React.FC = () => {
       .post("/api/users/login", data)
       .then((response) => handleAxiosSuccess(response));
 
-  const registerUser = (data: RegisterUserData) => {
-    axios
-      .post("/api/users/signup", data)
-      .then((response) => handleAxiosSuccess(response));
+  const registerUser = async (data: RegisterUserData) => {
+    console.log(data);
+    return await axios.post("/api/users/signup", data);
   };
 
   const passwordInputType = isPasswordShown ? "text" : "password";
