@@ -8,21 +8,28 @@ import Chat from "./components/Chat/Chat";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider, useSelector } from "react-redux";
 import store from "./store";
+import storage from "redux-persist/lib/storage";
+import { persistStore } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
 
 function App() {
   const queryClient = new QueryClient();
 
+  let persistor = persistStore(store);
+
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path={"/"} element={<Login />} />
-            <Route path={"/register"} element={<SignUp />} />
-            <Route path={"/messenger"} element={<Chat />} />
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <Routes>
+              <Route path={"/"} element={<Login />} />
+              <Route path={"/register"} element={<SignUp />} />
+              <Route path={"/messenger"} element={<Chat />} />
+            </Routes>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </PersistGate>
     </Provider>
   );
 }

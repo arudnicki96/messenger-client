@@ -9,9 +9,6 @@ import { RootState } from "../../store";
 
 const Chat = () => {
   const [isAsideShown, setIsAsideShown] = useState(false);
-  const selected = useSelector((state: RootState) => console.log(state));
-
-  console.log(selected);
   const gridAreas = isAsideShown
     ? `
   'header header header'
