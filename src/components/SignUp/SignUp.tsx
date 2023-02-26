@@ -6,11 +6,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
-enum actions {
-  login = "Login",
-  register = "Register",
-}
-
 type RegisterUserData = {
   username: string;
   email: string;
@@ -18,15 +13,9 @@ type RegisterUserData = {
   passwordConfirm: string;
 };
 
-type LoginUserData = {
-  email: string;
-  password: string;
-};
-
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
-  const [userAction, setUserAction] = useState<actions>(actions.login);
 
   const { register, handleSubmit } = useForm();
   const passwordIcon = (
@@ -35,13 +24,8 @@ const SignUp: React.FC = () => {
     </div>
   );
 
-  const loginUser = (data: LoginUserData) =>
-    axios
-      .post("/api/users/login", data)
-      .then((response) => handleAxiosSuccess(response));
-
-  const registerUser = (data: RegisterUserData) => {
-    axios
+  const registerUser = async (data: RegisterUserData) => {
+    return await axios
       .post("/api/users/signup", data)
       .then((response) => handleAxiosSuccess(response));
   };
@@ -57,43 +41,9 @@ const SignUp: React.FC = () => {
     } else {
       window.localStorage.setItem("username", username);
       window.localStorage.setItem("id", _id);
-      navigate("/messenger");
+      navigate("/");
     }
   };
-  const LoginForm = (
-    <div>
-      <form onSubmit={handleSubmit(loginUser)}>
-        <div className={styles.signUp}>
-          <label htmlFor={"email"}>Email</label>
-          <input type={"email"} name={"email"} {...register("email")}></input>
-          <label htmlFor={"new-password"}>Password</label>
-          <div className={styles.inputWrapper}>
-            <input
-              type={passwordInputType}
-              autoComplete={"current-password"}
-              id="current-password"
-              {...register("password")}
-            />
-            {passwordIcon}
-          </div>
-        </div>
-        <button
-          type={"submit"}
-          onClick={handleSubmit(loginUser)}
-          className={styles.submitButton}
-        >
-          {userAction}
-        </button>
-      </form>
-      <div
-        className={styles.registerLink}
-        onClick={() => setUserAction(actions.register)}
-      >
-        Don't have account yet? Tap to register
-      </div>
-    </div>
-  );
-
   const SignUpForm = (
     <form onSubmit={handleSubmit(registerUser)}>
       <div className={styles.signUp}>
@@ -130,15 +80,14 @@ const SignUp: React.FC = () => {
         onClick={handleSubmit(registerUser)}
         className={styles.submitButton}
       >
-        {userAction}
+        Register
       </button>
     </form>
   );
-  const currentForm = userAction === actions.login ? LoginForm : SignUpForm;
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.formWrapper}>{currentForm}</div>
+      <div className={styles.formWrapper}>{SignUpForm}</div>
     </div>
   );
 };

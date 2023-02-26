@@ -18,8 +18,6 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    "src/components/SignUp/Login.jsx"
-  ],
+    "**/*.tsx"],
   "exclude": ["node_modules"]
 }

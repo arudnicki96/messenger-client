@@ -1,0 +1,39 @@
+import AuthReducer from "./redux/slices/authSlice";
+import { configureStore, ThunkAction } from "@reduxjs/toolkit";
+import { AnyAction } from "@reduxjs/toolkit";
+import { persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import thunk from 'redux-thunk';
+import { persistStore } from "redux-persist";
+import sessionStorage from "redux-persist/es/storage/session";
+
+
+
+const persistConfig = {
+  timeout: 2000,
+  key: 'root',
+  storage: sessionStorage,
+}
+
+const persistedReducer = persistReducer(persistConfig, AuthReducer)
+
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: [thunk],
+});
+
+export const persistor = persistStore(store)
+
+
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  AnyAction
+>;
+
+export default store;
