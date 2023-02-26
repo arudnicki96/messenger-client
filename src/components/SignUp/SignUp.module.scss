@@ -1,7 +1,7 @@
 @import "./../../globalStyles/colors.scss";
 
 .wrapper {
-  width: 100%;
+  width: auto;
   height: 100%;
   background: var(--white);
   opacity: 0.75;
@@ -60,4 +60,8 @@
   cursor: pointer;
   text-align: center;
   padding-bottom: 8px;
+}
+
+.statusText {
+  color: hsl(0, 100%, 60%);
 }
