@@ -8,7 +8,6 @@ import Chat from "./components/Chat/Chat";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider, useSelector } from "react-redux";
 import store from "./store";
-import storage from "redux-persist/lib/storage";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 
