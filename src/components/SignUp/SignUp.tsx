@@ -4,30 +4,45 @@ import EyePasswordHide from "../../icons/EyePasswordHide";
 import EyePasswordShow from "../../icons/EyePasswordShow";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-
-type RegisterUserData = {
-  username: string;
-  email: string;
-  password: string;
-  passwordConfirm: string;
-};
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [passwordConfirm, setPasswordConfirm] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
 
-  const { register, handleSubmit } = useForm();
   const passwordIcon = (
     <div onClick={() => setIsPasswordShown(!isPasswordShown)}>
       {isPasswordShown ? <EyePasswordShow /> : <EyePasswordHide />}
     </div>
   );
+  const handleAxiosError = (error) => {
+    setErrorMessage(error.response.data.message);
+  };
 
-  const registerUser = async (data: RegisterUserData) => {
-    return await axios
-      .post("/api/users/signup", data)
-      .then((response) => handleAxiosSuccess(response));
+  const registerUser = async (e) => {
+    e.preventDefault();
+    if (password !== passwordConfirm) {
+      setErrorMessage(
+        "Password and confirm password field contain different value"
+      );
+    } else {
+      try {
+        return await axios
+          .post("/api/users/signup", {
+            email,
+            username,
+            password,
+            passwordConfirm,
+          })
+          .then((response) => handleAxiosSuccess(response));
+      } catch (err) {
+        handleAxiosError(err);
+      }
+    }
   };
 
   const passwordInputType = isPasswordShown ? "text" : "password";
@@ -35,25 +50,25 @@ const SignUp: React.FC = () => {
   const handleAxiosSuccess = (response) => {
     const user = response.data.user;
     const { _id, username } = user;
-    if (!user) {
-      // TODO there needs to be global frontend way of handling rejection
-      window.alert("ooops there was a problem");
-    } else {
-      window.localStorage.setItem("username", username);
-      window.localStorage.setItem("id", _id);
-      navigate("/");
-    }
+
+    window.localStorage.setItem("username", username);
+    window.localStorage.setItem("id", _id);
+    navigate("/");
   };
   const SignUpForm = (
-    <form onSubmit={handleSubmit(registerUser)}>
+    <form onSubmit={registerUser}>
       <div className={styles.signUp}>
         <label htmlFor={"email"}>Email</label>
-        <input type={"email"} name={"email"} {...register("email")}></input>
+        <input
+          type={"email"}
+          name={"email"}
+          onChange={(e) => setEmail(e.target.value)}
+        ></input>
         <label htmlFor={"username"}>Username</label>
         <input
           type={"text"}
           name={"username"}
-          {...register("username")}
+          onChange={(e) => setUsername(e.target.value)}
         ></input>
         <label htmlFor={"new-password"}>Password</label>
         <div className={styles.inputWrapper}>
@@ -61,7 +76,7 @@ const SignUp: React.FC = () => {
             type={passwordInputType}
             autoComplete={"new-password"}
             id="new-password"
-            {...register("password")}
+            onChange={(e) => setPassword(e.target.value)}
           />
           {passwordIcon}
         </div>
@@ -70,14 +85,14 @@ const SignUp: React.FC = () => {
           <input
             type={passwordInputType}
             name={"passwordConfirm"}
-            {...register("passwordConfirm")}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
           ></input>
           {passwordIcon}
         </div>
       </div>
       <button
         type={"submit"}
-        onClick={handleSubmit(registerUser)}
+        onClick={registerUser}
         className={styles.submitButton}
       >
         Register
@@ -87,7 +102,10 @@ const SignUp: React.FC = () => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.formWrapper}>{SignUpForm}</div>
+      <div className={styles.formWrapper}>
+        <p className={styles.statusText}>{errorMessage}</p>
+        {SignUpForm}
+      </div>
     </div>
   );
 };
