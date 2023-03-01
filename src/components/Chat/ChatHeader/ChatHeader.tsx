@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 
 const ChatHeader: React.FC = () => {
-  const username = useSelector((state: RootState) => state.user.username);
+  const username = useSelector((state: RootState) => state.auth.user.username);
 
   return (
     <div className={styles.wrapper}>

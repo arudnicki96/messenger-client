@@ -1,5 +1,6 @@
 import AuthReducer from "./redux/slices/authSlice";
-import { configureStore, ThunkAction } from "@reduxjs/toolkit";
+import MessengerReducer from './redux/slices/messengerSlice';
+import { combineReducers, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { AnyAction } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
@@ -15,7 +16,12 @@ const persistConfig = {
   storage: sessionStorage,
 }
 
-const persistedReducer = persistReducer(persistConfig, AuthReducer)
+const rootReducer = combineReducers({
+  auth: AuthReducer,
+  messenger: MessengerReducer
+})
+
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 const store = configureStore({
   reducer: persistedReducer,
