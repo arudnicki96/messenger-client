@@ -3,8 +3,14 @@ import styles from "./ChatHeader.module.scss";
 import IconSearch from "../../../icons/IconSearch";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
+import { onLogout } from "../../../redux/slices/authSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { clearMessengerState } from "../../../redux/slices/messengerSlice";
 
 const ChatHeader: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const username = useSelector((state: RootState) => state.auth.user.username);
 
   return (
@@ -17,7 +23,17 @@ const ChatHeader: React.FC = () => {
         ></input>
         <IconSearch />
       </div>
-      <div>{username}</div>
+      <div
+        onClick={() => {
+          window.localStorage.removeItem("username");
+          window.localStorage.removeItem("id");
+          dispatch(onLogout());
+          dispatch(clearMessengerState());
+          navigate("/");
+        }}
+      >
+        {username}
+      </div>
     </div>
   );
 };

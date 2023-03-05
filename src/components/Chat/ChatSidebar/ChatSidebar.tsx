@@ -4,59 +4,97 @@ import IconSearch from "../../../icons/IconSearch";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store";
-import { onConversationSelect } from "../../../redux/slices/messengerSlice";
+import {
+  setGlobalConversationId,
+  setGlobalSelectedUserId,
+} from "../../../redux/slices/messengerSlice";
+import { useUserDialogues } from "../../../api/useUserDialogues";
+
 type SearchInputProps = {
   searchQuery: string;
   setSearchQuery: Dispatch<SetStateAction<string>>;
 };
 
-type UserWithoutConversationProps = {
+type ConversationItem = {
   username: string;
   onPress: () => void;
+  message: string;
 };
 
 const ChatSidebar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [users, setUsers] = useState([]);
+  const { data: userDialogues, isSuccess: isSuccessUserDialogs } =
+    useUserDialogues();
 
   const dispatch = useDispatch();
-  const handleItemPress = (user) => dispatch(onConversationSelect(user));
+  const handleItemPress = (user) => {
+    dispatch(setGlobalSelectedUserId(user));
+    dispatch(setGlobalConversationId({ _id: null }));
+  };
 
   const token = useSelector((state: RootState) => state.auth.userToken);
-
   useEffect(() => {
-    if (searchQuery === "") {
-      setUsers([]);
-    } else {
+    {
+      const currentUsersIds =
+        isSuccessUserDialogs &&
+        userDialogues?.userCurrentConversationItemsData.map(
+          (item) => item.user._id
+        );
       const timer = setTimeout(
         async () =>
           await axios
             .get(`/api/users/${searchQuery}`, {
               headers: { authorization: `Bearer ${token}` },
             })
-            .then((response) => setUsers(response.data.users)),
+            .then((response) =>
+              setUsers(
+                response.data.users.filter(
+                  (user) => !currentUsersIds.includes(user._id)
+                )
+              )
+            ),
         300
       );
       return () => clearTimeout(timer);
     }
-  }, [searchQuery]);
+  }, [
+    searchQuery,
+    token,
+    isSuccessUserDialogs,
+    userDialogues?.userCurrentConversationItemsData,
+  ]);
 
   return (
     <div className={styles.wrapper}>
       <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      {isSuccessUserDialogs && searchQuery === ""
+        ? userDialogues.userCurrentConversationItemsData.map((item) => (
+            <ConversationItem
+              username={item.user?.username}
+              message={item.lastMessage.text}
+              onPress={() => {
+                dispatch(setGlobalSelectedUserId(item.user));
+                dispatch(setGlobalConversationId(item.dialog));
+              }}
+            />
+          ))
+        : null}
       {users.map((user) => (
         <ConversationItem
           username={user.username}
           onPress={() => handleItemPress(user)}
+          message={"Lets start chatting!"}
         />
       ))}
     </div>
   );
 };
 
-const ConversationItem: React.FC<UserWithoutConversationProps> = ({
+const ConversationItem: React.FC<ConversationItem> = ({
   username,
   onPress,
+  message,
 }) => {
   return (
     <div className={styles.conversationItemWrapper} onClick={onPress}>
@@ -70,17 +108,16 @@ const ConversationItem: React.FC<UserWithoutConversationProps> = ({
       ></img>
       <div className={styles.nicknameText}>
         <p className={styles.nickname}>{username}</p>
-        <p className={styles.textMessage}>
-          Text text text text text even more text;Text text text text text even
-          more text;Text text text text text even more text;
-        </p>
+        <p className={styles.textMessage}>{message}</p>
       </div>
     </div>
   );
 };
 
-const SearchInput: React.FC<SearchInputProps> = (props: SearchInputProps) => {
-  const { searchQuery, setSearchQuery } = props;
+const SearchInput: React.FC<SearchInputProps> = ({
+  searchQuery,
+  setSearchQuery,
+}) => {
   return (
     <div className={styles.inputWrapper}>
       <input
