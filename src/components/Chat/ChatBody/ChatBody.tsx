@@ -1,9 +1,13 @@
 import React, { useEffect, useMemo } from "react";
 import styles from "./ChatBodyStyles.module.scss";
 import clsx from "clsx";
-import { useFetchDialogue } from "../../../api/useFetchDialogue";
+import {
+  DialogMessages,
+  useFetchDialogue,
+} from "../../../api/useFetchDialogue";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
+import { Message } from "../../../types/messenger";
 
 interface TextMessageInterface {
   createdBy: string;
@@ -11,7 +15,8 @@ interface TextMessageInterface {
 }
 
 const TextMessage: React.FC<TextMessageInterface> = ({ createdBy, text }) => {
-  const selfId = useSelector((state: RootState) => state.auth.user._id);
+  const selfId: string =
+    useSelector((state: RootState) => state.auth.user._id) || "";
   const receivedOrSentStyling =
     createdBy === selfId ? styles.sent : styles.received;
   return (
@@ -19,17 +24,17 @@ const TextMessage: React.FC<TextMessageInterface> = ({ createdBy, text }) => {
   );
 };
 
-const ChatBody: React.FC = (): any => {
+const ChatBody: React.FC = (): JSX.Element => {
   const dialogueId = useSelector(
     (state: RootState) => state.messenger.dialogId
   );
   const {
-    data: dialogue = [],
+    data: dialogues,
     isSuccess,
     refetch: refetchDialogue,
     isLoading,
   } = useFetchDialogue();
-  const fetchedMessages = dialogue.Messages;
+  const fetchedMessages: Message[] = dialogues?.messages;
   useEffect(() => {
     const fn = async () => await refetchDialogue();
     fn();
@@ -52,7 +57,7 @@ const ChatBody: React.FC = (): any => {
         )}
       </>
     );
-  }, [fetchedMessages, isLoading, isSuccess]);
+  }, [dialogues, fetchedMessages, isLoading, isSuccess]);
   return Body;
 };
 export default ChatBody;

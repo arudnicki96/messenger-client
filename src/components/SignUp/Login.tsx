@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import styles from "./SignUp.module.scss";
 import EyePasswordHide from "../../icons/EyePasswordHide";
 import EyePasswordShow from "../../icons/EyePasswordShow";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
 import { onLoginSuccess } from "../../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
+import { LoginSuccessResponse } from "../../types/loginSuccessResponse";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -16,8 +17,9 @@ const Login: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const handleAxiosSuccess = (response) => {
-    dispatch(onLoginSuccess(response.data));
+  const handleAxiosSuccess = (response: AxiosResponse) => {
+    const data: LoginSuccessResponse = response.data;
+    dispatch(onLoginSuccess(data));
     navigate("/messenger");
   };
   const passwordIcon = (

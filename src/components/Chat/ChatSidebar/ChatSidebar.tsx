@@ -9,6 +9,7 @@ import {
   setGlobalSelectedUserId,
 } from "../../../redux/slices/messengerSlice";
 import { useUserDialogues } from "../../../api/useUserDialogues";
+import { User } from "../../../types/user";
 
 type SearchInputProps = {
   searchQuery: string;
@@ -19,16 +20,17 @@ type ConversationItem = {
   username: string;
   onPress: () => void;
   message: string;
+  date: number;
 };
 
 const ChatSidebar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const { data: userDialogues, isSuccess: isSuccessUserDialogs } =
     useUserDialogues();
 
   const dispatch = useDispatch();
-  const handleItemPress = (user) => {
+  const handleItemPress = (user: User) => {
     dispatch(setGlobalSelectedUserId(user));
     dispatch(setGlobalConversationId({ _id: null }));
   };
@@ -38,9 +40,7 @@ const ChatSidebar: React.FC = () => {
     {
       const currentUsersIds =
         isSuccessUserDialogs &&
-        userDialogues?.userCurrentConversationItemsData.map(
-          (item) => item.user._id
-        );
+        userDialogues.dialogues.map((item) => item.user._id);
       const timer = setTimeout(
         async () =>
           await axios
@@ -58,19 +58,16 @@ const ChatSidebar: React.FC = () => {
       );
       return () => clearTimeout(timer);
     }
-  }, [
-    searchQuery,
-    token,
-    isSuccessUserDialogs,
-    userDialogues?.userCurrentConversationItemsData,
-  ]);
+  }, [searchQuery, token, isSuccessUserDialogs, userDialogues?.dialogues]);
 
   return (
     <div className={styles.wrapper}>
       <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       {isSuccessUserDialogs && searchQuery === ""
-        ? userDialogues.userCurrentConversationItemsData.map((item) => (
+        ? userDialogues?.dialogues.sort().map((item) => (
             <ConversationItem
+              key={item.lastMessage._id}
+              date={item.lastMessage.createdAt}
               username={item.user?.username}
               message={item.lastMessage.text}
               onPress={() => {
@@ -82,6 +79,7 @@ const ChatSidebar: React.FC = () => {
         : null}
       {users.map((user) => (
         <ConversationItem
+          date={new Date().getTime()}
           username={user.username}
           onPress={() => handleItemPress(user)}
           message={"Lets start chatting!"}
@@ -95,7 +93,10 @@ const ConversationItem: React.FC<ConversationItem> = ({
   username,
   onPress,
   message,
+  date,
 }) => {
+  const hour = new Date(date).getHours();
+  const minutes = new Date(date).getMinutes();
   return (
     <div className={styles.conversationItemWrapper} onClick={onPress}>
       <img
@@ -107,7 +108,12 @@ const ConversationItem: React.FC<ConversationItem> = ({
         alt={"avatar"}
       ></img>
       <div className={styles.nicknameText}>
-        <p className={styles.nickname}>{username}</p>
+        <div className={styles.usernameContainer}>
+          <p>{username}</p>
+          <p>
+            {hour}:{minutes}
+          </p>
+        </div>
         <p className={styles.textMessage}>{message}</p>
       </div>
     </div>

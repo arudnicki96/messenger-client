@@ -27,7 +27,7 @@ const ChatHeader: React.FC = () => {
         onClick={() => {
           window.localStorage.removeItem("username");
           window.localStorage.removeItem("id");
-          dispatch(onLogout());
+          dispatch(onLogout({ user: null, userToken: null }));
           dispatch(clearMessengerState());
           navigate("/");
         }}
