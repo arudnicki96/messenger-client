@@ -16,7 +16,7 @@ type SearchInputProps = {
   setSearchQuery: Dispatch<SetStateAction<string>>;
 };
 
-type ConversationItem = {
+type ConversationItemProps = {
   username: string;
   onPress: () => void;
   message: string;
@@ -37,27 +37,25 @@ const ChatSidebar: React.FC = () => {
 
   const token = useSelector((state: RootState) => state.auth.userToken);
   useEffect(() => {
-    {
-      const currentUsersIds =
-        isSuccessUserDialogs &&
-        userDialogues.dialogues.map((item) => item.user._id);
-      const timer = setTimeout(
-        async () =>
-          await axios
-            .get(`/api/users/${searchQuery}`, {
-              headers: { authorization: `Bearer ${token}` },
-            })
-            .then((response) =>
-              setUsers(
-                response.data.users.filter(
-                  (user) => !currentUsersIds.includes(user._id)
-                )
+    const currentUsersIds =
+      isSuccessUserDialogs &&
+      userDialogues.dialogues.map((item) => item.user._id);
+    const timer = setTimeout(
+      async () =>
+        await axios
+          .get(`/api/users/${searchQuery}`, {
+            headers: { authorization: `Bearer ${token}` },
+          })
+          .then((response) =>
+            setUsers(
+              response.data.users.filter(
+                (user) => !currentUsersIds.includes(user._id)
               )
-            ),
-        300
-      );
-      return () => clearTimeout(timer);
-    }
+            )
+          ),
+      300
+    );
+    return () => clearTimeout(timer);
   }, [searchQuery, token, isSuccessUserDialogs, userDialogues?.dialogues]);
 
   return (
@@ -89,7 +87,7 @@ const ChatSidebar: React.FC = () => {
   );
 };
 
-const ConversationItem: React.FC<ConversationItem> = ({
+const ConversationItem: React.FC<ConversationItemProps> = ({
   username,
   onPress,
   message,

@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import styles from "./ChatBodyStyles.module.scss";
 import clsx from "clsx";
-import {
-  DialogMessages,
-  useFetchDialogue,
-} from "../../../api/useFetchDialogue";
+import { useFetchDialogue } from "../../../api/useFetchDialogue";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { Message } from "../../../types/messenger";
@@ -57,7 +54,7 @@ const ChatBody: React.FC = (): JSX.Element => {
         )}
       </>
     );
-  }, [dialogues, fetchedMessages, isLoading, isSuccess]);
+  }, [fetchedMessages, isLoading, isSuccess, dialogueId]);
   return Body;
 };
 export default ChatBody;

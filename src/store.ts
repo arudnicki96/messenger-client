@@ -1,36 +1,31 @@
 import AuthReducer from "./redux/slices/authSlice";
-import MessengerReducer from './redux/slices/messengerSlice';
+import MessengerReducer from "./redux/slices/messengerSlice";
 import { combineReducers, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { AnyAction } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import thunk from 'redux-thunk';
+import thunk from "redux-thunk";
 import { persistStore } from "redux-persist";
 import sessionStorage from "redux-persist/es/storage/session";
 
-
-
 const persistConfig = {
   timeout: 2000,
-  key: 'root',
+  key: "root",
   storage: sessionStorage,
-}
+};
 
 const rootReducer = combineReducers({
   auth: AuthReducer,
-  messenger: MessengerReducer
-})
+  messenger: MessengerReducer,
+});
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,
   middleware: [thunk],
 });
 
-export const persistor = persistStore(store)
-
-
+export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

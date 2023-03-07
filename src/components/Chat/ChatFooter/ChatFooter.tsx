@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styles from "./ChatFooter.module.scss";
-import clsx from "clsx";
 import SendMessageIcon from "../../../icons/SendMessageIcon";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
