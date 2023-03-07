@@ -37,6 +37,7 @@ const ChatSidebar: React.FC = () => {
 
   const token = useSelector((state: RootState) => state.auth.userToken);
   useEffect(() => {
+    if (searchQuery === "") return;
     const currentUsersIds =
       isSuccessUserDialogs &&
       userDialogues.dialogues.map((item) => item.user._id);
