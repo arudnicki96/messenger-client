@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./ChatSidebar.module.scss";
 import IconSearch from "../../../icons/IconSearch";
 import axios from "axios";
@@ -10,30 +10,28 @@ import {
 } from "../../../redux/slices/messengerSlice";
 import { useUserDialogues } from "../../../api/useUserDialogues";
 import { User } from "../../../types/user";
-
-type SearchInputProps = {
-  searchQuery: string;
-  setSearchQuery: Dispatch<SetStateAction<string>>;
-};
-
-type ConversationItemProps = {
-  username: string;
-  onPress: () => void;
-  message: string;
-  date: number;
-};
+import Swal from "sweetalert2";
+import { AxiosError } from "axios";
+import { ConversationItemProps } from "../../../types/conversationItem";
+import { SearchInputProps } from "../../../types/searchInput";
 
 const ChatSidebar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
-  const { data: userDialogues, isSuccess: isSuccessUserDialogs } =
-    useUserDialogues();
+  const {
+    data: userDialogues,
+    isSuccess: isSuccessUserDialogs,
+    error,
+  } = useUserDialogues();
 
   const dispatch = useDispatch();
   const handleItemPress = (user: User) => {
     dispatch(setGlobalSelectedUserId(user));
     dispatch(setGlobalConversationId({ _id: null }));
   };
+
+  const fireErrorAlert = (error: AxiosError) => Swal.fire(error.message);
+  if (axios.isAxiosError(error)) fireErrorAlert(error);
 
   const token = useSelector((state: RootState) => state.auth.userToken);
   useEffect(() => {

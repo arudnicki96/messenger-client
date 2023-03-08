@@ -5,14 +5,16 @@ import { RootState } from "../store";
 import { setGlobalConversationId } from "../redux/slices/messengerSlice";
 import { useQueryClient } from "react-query";
 import { Dialog } from "../types/messenger";
-import { User } from "../types/user";
+import { AxiosError } from "axios";
+import { UseMutationResult } from "react-query";
+import Swal from "sweetalert2";
 
 // We use just ID's from User's Object
 export const useCreateDialogue = (
-  user_1: Partial<User>,
-  user_2: Partial<User>,
+  user_1: string,
+  user_2: string,
   text: string
-) => {
+): UseMutationResult => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const token: string =
@@ -21,7 +23,7 @@ export const useCreateDialogue = (
   return useMutation(
     async () =>
       await axios
-        .post(
+        .post<Dialog>(
           "/api/dialogs",
           {
             user_1,
@@ -38,6 +40,9 @@ export const useCreateDialogue = (
       onSuccess: () => {
         queryClient.invalidateQueries("dialogue");
         queryClient.invalidateQueries("userDialogues");
+      },
+      onError: (err: AxiosError) => {
+        Swal.fire(err.message);
       },
     }
   );

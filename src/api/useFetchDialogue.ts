@@ -1,20 +1,18 @@
 import axios from "axios";
-import { useQuery } from "react-query";
+import { useQuery, UseQueryResult } from "react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { Message } from "../types/messenger";
+import { DialogMessages } from "../types/messenger";
 
-export type DialogMessages = { messages: Message[] };
-
-export const useFetchDialogue = () => {
+export const useFetchDialogue = (): UseQueryResult<DialogMessages, unknown> => {
   const token: string =
     useSelector((state: RootState) => state.auth.userToken) || "";
   const dialogueId: string = useSelector(
     (state: RootState) => state.messenger.dialogId
   );
   const fetchDialogue = async () => {
-    const data: DialogMessages = await axios
-      .get(`/api/dialogs/${dialogueId}`, {
+    const data = await axios
+      .get<DialogMessages>(`/api/dialogs/${dialogueId}`, {
         headers: { authorization: `Bearer ${token}` },
       })
       .then((response) => response.data);

@@ -7,26 +7,28 @@ import { useCreateDialogue } from "../../../api/useCreateDialogue";
 import { useCreateMessage } from "../../../api/useCreateMessage";
 
 const ChatFooter: React.FC = (): JSX.Element => {
-  const sender = useSelector((state: RootState) => state.auth.user._id);
-  const receipent = useSelector(
+  const sender: string = useSelector((state: RootState) => state.auth.user._id);
+  const receipent: string = useSelector(
     (state: RootState) => state.messenger.selectedUserId
   );
-  const dialogId = useSelector((state: RootState) => state.messenger.dialogId);
+  const dialogId: string | null = useSelector(
+    (state: RootState) => state.messenger.dialogId
+  );
   const [message, setMessage] = useState<string>("");
 
-  const { mutate: createMessage } = useCreateMessage(sender, message);
+  const { mutate: createMessageMutation } = useCreateMessage(sender, message);
 
   const { mutate: createDialogueMutation } = useCreateDialogue(
     sender,
     receipent,
     message
   );
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!dialogId) {
-      createDialogueMutation();
+      createDialogueMutation(null);
     } else {
-      createMessage();
+      createMessageMutation(null);
     }
     setMessage("");
   };

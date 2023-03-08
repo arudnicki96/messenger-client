@@ -1,5 +1,3 @@
-import React from "react";
-
 export type Message = {
   createdAt: number;
   createdBy: string;
@@ -13,3 +11,5 @@ export type Dialog = {
   user_1: string;
   user_2: string;
 };
+
+export type DialogMessages = { messages: Message[] };

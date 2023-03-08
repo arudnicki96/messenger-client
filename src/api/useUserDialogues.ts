@@ -1,23 +1,17 @@
 import axios from "axios";
-import { useQuery } from "react-query";
+import { useQuery, UseQueryResult } from "react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { User } from "../types/user";
-import { Message, Dialog } from "../types/messenger";
+import { UserDialoguesResponse } from "../types/userDialogueResponse";
 
-type UserDialogues = {
-  dialogues: {
-    user: Partial<User>;
-    lastMessage: Message;
-    dialog: Partial<Dialog>;
-  }[];
-};
-
-export const useUserDialogues = () => {
+export const useUserDialogues = (): UseQueryResult<
+  UserDialoguesResponse,
+  unknown
+> => {
   const selfId: string = useSelector((state: RootState) => state.auth.user._id);
   const fetchDialogues = async () => {
-    const data: UserDialogues = await axios
-      .get(`api/dialogs/getUserDialogs/${selfId}`)
+    const data = await axios
+      .get<UserDialoguesResponse>(`api/dialogs/getUserDialogs/${selfId}`)
       .then((response) => response.data);
     return data;
   };

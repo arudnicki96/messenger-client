@@ -5,13 +5,11 @@ import { useFetchDialogue } from "../../../api/useFetchDialogue";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { Message } from "../../../types/messenger";
+import { TextMessageType } from "../../../types/textMessage";
+import axios, { AxiosError } from "axios";
+import Swal from "sweetalert2";
 
-interface TextMessageInterface {
-  createdBy: string;
-  text: string;
-}
-
-const TextMessage: React.FC<TextMessageInterface> = ({ createdBy, text }) => {
+const TextMessage: React.FC<TextMessageType> = ({ createdBy, text }) => {
   const selfId: string =
     useSelector((state: RootState) => state.auth.user._id) || "";
   const receivedOrSentStyling =
@@ -22,7 +20,7 @@ const TextMessage: React.FC<TextMessageInterface> = ({ createdBy, text }) => {
 };
 
 const ChatBody: React.FC = (): JSX.Element => {
-  const dialogueId = useSelector(
+  const dialogueId: string | null = useSelector(
     (state: RootState) => state.messenger.dialogId
   );
   const {
@@ -30,12 +28,17 @@ const ChatBody: React.FC = (): JSX.Element => {
     isSuccess,
     refetch: refetchDialogue,
     isLoading,
+    error,
   } = useFetchDialogue();
+
   const fetchedMessages: Message[] = dialogues?.messages;
   useEffect(() => {
     const fn = async () => await refetchDialogue();
     fn();
   }, [dialogueId, refetchDialogue]);
+
+  const fireErrorAlert = (error: AxiosError) => Swal.fire(error.message);
+  if (axios.isAxiosError(error)) fireErrorAlert(error);
 
   const Body = useMemo(() => {
     return (
