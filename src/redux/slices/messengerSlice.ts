@@ -32,15 +32,6 @@ const messengerSlice = createSlice({
       state.isGroupConversation = null;
       state.dialogId = null;
     },
-    setActiveUsers: (state, { payload }) => {
-      state.activeUsers = [...payload];
-    },
-    addActiveUsers: (state, { payload }) => {
-      state.activeUsers = state.activeUsers.filter(
-        (user) => user.userId !== payload.userId
-      );
-      state.activeUsers = [...state.activeUsers, payload];
-    },
   },
   extraReducers: {},
 });
@@ -49,8 +40,6 @@ export const {
   setGlobalSelectedUserId,
   setGlobalConversationId,
   clearMessengerState,
-  setActiveUsers,
-  addActiveUsers,
 } = messengerSlice.actions;
 
 export default messengerSlice.reducer;

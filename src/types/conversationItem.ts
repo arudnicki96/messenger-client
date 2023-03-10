@@ -3,4 +3,5 @@ export type ConversationItemProps = {
   onPress: () => void;
   message: string;
   date: number;
+  isActive: boolean;
 };

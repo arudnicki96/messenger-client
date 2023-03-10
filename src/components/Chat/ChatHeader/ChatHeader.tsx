@@ -7,6 +7,7 @@ import { onLogout } from "../../../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearMessengerState } from "../../../redux/slices/messengerSlice";
+import socket from "../../../socket/socket";
 
 const ChatHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const ChatHeader: React.FC = () => {
           window.localStorage.removeItem("username");
           window.localStorage.removeItem("id");
           dispatch(onLogout({ user: null, userToken: null }));
+          socket.disconnect();
           dispatch(clearMessengerState());
           navigate("/");
         }}

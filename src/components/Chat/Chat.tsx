@@ -9,7 +9,8 @@ import { useDispatch } from "react-redux";
 import {
   setActiveUsers,
   addActiveUsers,
-} from "../../redux/slices/messengerSlice";
+  removeInactiveUser,
+} from "../../redux/slices/websocketSlice";
 import { useQueryClient } from "react-query";
 
 const Chat = () => {
@@ -36,7 +37,9 @@ const Chat = () => {
   socket.on("private message", ({ content, from }) => {
     queryClient.invalidateQueries("userDialogues");
   });
-
+  socket.on("user disconnected", (event) => {
+    dispatch(removeInactiveUser(event));
+  });
   return (
     <div
       className={styles.wrapper}

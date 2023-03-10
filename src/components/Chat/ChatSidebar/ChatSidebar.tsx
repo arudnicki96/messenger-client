@@ -14,6 +14,7 @@ import Swal from "sweetalert2";
 import { AxiosError } from "axios";
 import { ConversationItemProps } from "../../../types/conversationItem";
 import { SearchInputProps } from "../../../types/searchInput";
+import GreenActiveCircle from "../../../icons/GreenActiveCircle";
 
 const ChatSidebar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -34,6 +35,10 @@ const ChatSidebar: React.FC = () => {
   if (axios.isAxiosError(error)) fireErrorAlert(error);
 
   const token = useSelector((state: RootState) => state.auth.userToken);
+
+  const activeUsers = useSelector(
+    (state: RootState) => state.websocket.activeUsers
+  ).map((user) => user.userId);
   useEffect(() => {
     if (searchQuery === "") return;
     const currentUsersIds =
@@ -71,6 +76,7 @@ const ChatSidebar: React.FC = () => {
                 dispatch(setGlobalSelectedUserId(item.user));
                 dispatch(setGlobalConversationId(item.dialog));
               }}
+              isActive={activeUsers.includes(item.user._id)}
             />
           ))
         : null}
@@ -80,6 +86,7 @@ const ChatSidebar: React.FC = () => {
           username={user.username}
           onPress={() => handleItemPress(user)}
           message={"Lets start chatting!"}
+          isActive={activeUsers.includes(user._id)}
         />
       ))}
     </div>
@@ -91,19 +98,23 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   onPress,
   message,
   date,
+  isActive,
 }) => {
   const hour = new Date(date).getHours();
   const minutes = new Date(date).getMinutes();
   return (
     <div className={styles.conversationItemWrapper} onClick={onPress}>
-      <img
-        src={
-          "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/1200px-SpongeBob_SquarePants_character.svg.png"
-        }
-        width={64}
-        height={64}
-        alt={"avatar"}
-      ></img>
+      <div className={styles.photoWrapper}>
+        <img
+          src={
+            "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/1200px-SpongeBob_SquarePants_character.svg.png"
+          }
+          width={64}
+          height={64}
+          alt={"avatar"}
+        ></img>
+        {isActive && <GreenActiveCircle />}
+      </div>
       <div className={styles.nicknameText}>
         <div className={styles.usernameContainer}>
           <p>{username}</p>
