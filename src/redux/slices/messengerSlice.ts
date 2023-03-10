@@ -1,9 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { ActiveUsers } from "../../types/activeUsers";
 
-const initialState = {
+type InitialMessengerState = {
+  selectedUserId: null | string;
+  isGroupConversation: boolean;
+  dialogId: string | null;
+  activeUsers: ActiveUsers[];
+};
+
+const initialState: InitialMessengerState = {
   selectedUserId: null,
   isGroupConversation: false,
   dialogId: null,
+  activeUsers: [],
 };
 
 const messengerSlice = createSlice({
@@ -23,6 +32,15 @@ const messengerSlice = createSlice({
       state.isGroupConversation = null;
       state.dialogId = null;
     },
+    setActiveUsers: (state, { payload }) => {
+      state.activeUsers = [...payload];
+    },
+    addActiveUsers: (state, { payload }) => {
+      state.activeUsers = state.activeUsers.filter(
+        (user) => user.userId !== payload.userId
+      );
+      state.activeUsers = [...state.activeUsers, payload];
+    },
   },
   extraReducers: {},
 });
@@ -31,6 +49,8 @@ export const {
   setGlobalSelectedUserId,
   setGlobalConversationId,
   clearMessengerState,
+  setActiveUsers,
+  addActiveUsers,
 } = messengerSlice.actions;
 
 export default messengerSlice.reducer;
