@@ -1,9 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { ActiveUsers } from "../../types/activeUsers";
 
-const initialState = {
+type InitialMessengerState = {
+  selectedUserId: null | string;
+  isGroupConversation: boolean;
+  dialogId: string | null;
+  activeUsers: ActiveUsers[];
+};
+
+const initialState: InitialMessengerState = {
   selectedUserId: null,
   isGroupConversation: false,
   dialogId: null,
+  activeUsers: [],
 };
 
 const messengerSlice = createSlice({

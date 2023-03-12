@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { onLoginSuccess } from "../../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
 import { LoginSuccessResponse } from "../../types/loginSuccessResponse";
+import socket from "../../socket/socket";
+import Swal from "sweetalert2";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -20,8 +22,15 @@ const Login: React.FC = () => {
   const handleAxiosSuccess = (response: AxiosResponse) => {
     const data: LoginSuccessResponse = response.data;
     dispatch(onLoginSuccess(data));
+    socket.auth = { userId: data.user._id, username: data.user.username };
+    socket.connect();
+
     navigate("/messenger");
   };
+
+  socket.on("connect_error", (err) => {
+    if (err.message) Swal.fire(err.message);
+  });
   const passwordIcon = (
     <div onClick={() => setIsPasswordShown(!isPasswordShown)}>
       {isPasswordShown ? <EyePasswordShow /> : <EyePasswordHide />}

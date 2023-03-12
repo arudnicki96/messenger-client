@@ -21,11 +21,22 @@
 .conversationItemWrapper:hover {
   background-color: var(--twitter-light-gray);
 }
+
+.photoWrapper {
+  position: relative;
+  padding: 4px 6px;
+  svg {
+    position: absolute;
+    right: -8px;
+    bottom: 0px;
+  }
+}
 .nicknameText {
   display: flex;
   width: 100%;
   flex-direction: column;
   justify-content: center;
+  padding-left: 8px;
   padding-right: 16px;
   overflow: hidden;
   margin-left: 8px;

@@ -1,5 +1,6 @@
 import AuthReducer from "./redux/slices/authSlice";
 import MessengerReducer from "./redux/slices/messengerSlice";
+import WebsocketReducer from "./redux/slices/websocketSlice";
 import { combineReducers, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import { AnyAction } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
@@ -16,6 +17,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: AuthReducer,
   messenger: MessengerReducer,
+  websocket: WebsocketReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

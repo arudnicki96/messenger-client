@@ -4,8 +4,18 @@ import ChatBody from "./ChatBody/ChatBody";
 import ChatFooter from "./ChatFooter/ChatFooter";
 import ChatSidebar from "./ChatSidebar/ChatSidebar";
 import ChatHeader from "./ChatHeader/ChatHeader";
+import socket from "../../socket/socket";
+import { useDispatch } from "react-redux";
+import {
+  setActiveUsers,
+  addActiveUsers,
+  removeInactiveUser,
+} from "../../redux/slices/websocketSlice";
+import { useQueryClient } from "react-query";
 
 const Chat = () => {
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const gridAreas = false
     ? `
   'header header header'
@@ -17,6 +27,19 @@ const Chat = () => {
     'nav main main' 
     'nav footer footer'`;
 
+  socket.on("users", (users) => {
+    dispatch(setActiveUsers(users));
+  });
+  socket.on("user connected", (user) => {
+    dispatch(addActiveUsers(user));
+  });
+
+  socket.on("private message", ({ content, from }) => {
+    queryClient.invalidateQueries("userDialogues");
+  });
+  socket.on("user disconnected", (event) => {
+    dispatch(removeInactiveUser(event));
+  });
   return (
     <div
       className={styles.wrapper}
