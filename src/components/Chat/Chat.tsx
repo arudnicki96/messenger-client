@@ -36,6 +36,7 @@ const Chat = () => {
 
   socket.on("private message", ({ content, from }) => {
     queryClient.invalidateQueries("userDialogues");
+    queryClient.invalidateQueries("dialogue");
   });
   socket.on("user disconnected", (event) => {
     dispatch(removeInactiveUser(event));

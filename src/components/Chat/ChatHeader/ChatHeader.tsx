@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearMessengerState } from "../../../redux/slices/messengerSlice";
 import socket from "../../../socket/socket";
+import LogoutIcon from "../../../icons/LogoutIcon";
 
 const ChatHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -24,17 +25,20 @@ const ChatHeader: React.FC = () => {
         ></input>
         <IconSearch />
       </div>
-      <div
-        onClick={() => {
-          window.localStorage.removeItem("username");
-          window.localStorage.removeItem("id");
-          dispatch(onLogout({ user: null, userToken: null }));
-          socket.disconnect();
-          dispatch(clearMessengerState());
-          navigate("/");
-        }}
-      >
+      <div className={styles.logoutContainer}>
         {username}
+        <div
+          onClick={() => {
+            window.localStorage.removeItem("username");
+            window.localStorage.removeItem("id");
+            dispatch(onLogout({ user: null, userToken: null }));
+            socket.disconnect();
+            dispatch(clearMessengerState());
+            navigate("/");
+          }}
+        >
+          <LogoutIcon />
+        </div>
       </div>
     </div>
   );

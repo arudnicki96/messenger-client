@@ -30,12 +30,19 @@ const ChatBody: React.FC = (): JSX.Element => {
     isLoading,
     error,
   } = useFetchDialogue();
-
+  const messageWrapper = document.getElementById("messageWrapper");
   const fetchedMessages: Message[] = dialogues?.messages;
   useEffect(() => {
     const fn = async () => await refetchDialogue();
     fn();
   }, [dialogueId, refetchDialogue]);
+
+  useEffect(() => {
+    messageWrapper?.scrollTo({
+      behavior: "auto",
+      top: messageWrapper?.scrollHeight,
+    });
+  }, [fetchedMessages, messageWrapper]);
 
   const fireErrorAlert = (error: AxiosError) => Swal.fire(error.message);
   if (axios.isAxiosError(error)) fireErrorAlert(error);
@@ -47,7 +54,7 @@ const ChatBody: React.FC = (): JSX.Element => {
         {isSuccess && (
           <main className={styles.wrapper}>
             <div className={styles.header}>{dialogueId}</div>
-            <ul className={styles.messagesWrapper}>
+            <ul className={styles.messagesWrapper} id={"messageWrapper"}>
               {fetchedMessages.map((item) => {
                 const { text, createdBy } = item;
                 return <TextMessage createdBy={createdBy} text={text} />;

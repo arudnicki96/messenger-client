@@ -106,11 +106,9 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
     <div className={styles.conversationItemWrapper} onClick={onPress}>
       <div className={styles.photoWrapper}>
         <img
-          src={
-            "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/1200px-SpongeBob_SquarePants_character.svg.png"
-          }
+          src={require("../../../userPhoto.png")}
           width={64}
-          height={64}
+          height={48}
           alt={"avatar"}
         ></img>
         {isActive && <GreenActiveCircle />}
