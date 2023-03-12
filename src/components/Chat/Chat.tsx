@@ -1,15 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./ChatLayout.module.scss";
 import ChatBody from "./ChatBody/ChatBody";
 import ChatFooter from "./ChatFooter/ChatFooter";
 import ChatSidebar from "./ChatSidebar/ChatSidebar";
 import ChatHeader from "./ChatHeader/ChatHeader";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 
 const Chat = () => {
-  const [isAsideShown, setIsAsideShown] = useState(false);
-  const gridAreas = isAsideShown
+  const gridAreas = false
     ? `
   'header header header'
   'nav main aside'

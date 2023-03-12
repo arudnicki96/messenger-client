@@ -1,63 +1,99 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./ChatSidebar.module.scss";
 import IconSearch from "../../../icons/IconSearch";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store";
-import { onConversationSelect } from "../../../redux/slices/messengerSlice";
-type SearchInputProps = {
-  searchQuery: string;
-  setSearchQuery: Dispatch<SetStateAction<string>>;
-};
-
-type UserWithoutConversationProps = {
-  username: string;
-  onPress: () => void;
-};
+import {
+  setGlobalConversationId,
+  setGlobalSelectedUserId,
+} from "../../../redux/slices/messengerSlice";
+import { useUserDialogues } from "../../../api/useUserDialogues";
+import { User } from "../../../types/user";
+import Swal from "sweetalert2";
+import { AxiosError } from "axios";
+import { ConversationItemProps } from "../../../types/conversationItem";
+import { SearchInputProps } from "../../../types/searchInput";
 
 const ChatSidebar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const {
+    data: userDialogues,
+    isSuccess: isSuccessUserDialogs,
+    error,
+  } = useUserDialogues();
 
   const dispatch = useDispatch();
-  const handleItemPress = (user) => dispatch(onConversationSelect(user));
+  const handleItemPress = (user: User) => {
+    dispatch(setGlobalSelectedUserId(user));
+    dispatch(setGlobalConversationId({ _id: null }));
+  };
+
+  const fireErrorAlert = (error: AxiosError) => Swal.fire(error.message);
+  if (axios.isAxiosError(error)) fireErrorAlert(error);
 
   const token = useSelector((state: RootState) => state.auth.userToken);
-
   useEffect(() => {
-    if (searchQuery === "") {
-      setUsers([]);
-    } else {
-      const timer = setTimeout(
-        async () =>
-          await axios
-            .get(`/api/users/${searchQuery}`, {
-              headers: { authorization: `Bearer ${token}` },
-            })
-            .then((response) => setUsers(response.data.users)),
-        300
-      );
-      return () => clearTimeout(timer);
-    }
-  }, [searchQuery]);
+    if (searchQuery === "") return;
+    const currentUsersIds =
+      isSuccessUserDialogs &&
+      userDialogues.dialogues.map((item) => item.user._id);
+    const timer = setTimeout(
+      async () =>
+        await axios
+          .get(`/api/users/${searchQuery}`, {
+            headers: { authorization: `Bearer ${token}` },
+          })
+          .then((response) =>
+            setUsers(
+              response.data.users.filter(
+                (user) => !currentUsersIds.includes(user._id)
+              )
+            )
+          ),
+      300
+    );
+    return () => clearTimeout(timer);
+  }, [searchQuery, token, isSuccessUserDialogs, userDialogues?.dialogues]);
 
   return (
     <div className={styles.wrapper}>
       <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      {isSuccessUserDialogs && searchQuery === ""
+        ? userDialogues?.dialogues.sort().map((item) => (
+            <ConversationItem
+              key={item.lastMessage._id}
+              date={item.lastMessage.createdAt}
+              username={item.user?.username}
+              message={item.lastMessage.text}
+              onPress={() => {
+                dispatch(setGlobalSelectedUserId(item.user));
+                dispatch(setGlobalConversationId(item.dialog));
+              }}
+            />
+          ))
+        : null}
       {users.map((user) => (
         <ConversationItem
+          date={new Date().getTime()}
           username={user.username}
           onPress={() => handleItemPress(user)}
+          message={"Lets start chatting!"}
         />
       ))}
     </div>
   );
 };
 
-const ConversationItem: React.FC<UserWithoutConversationProps> = ({
+const ConversationItem: React.FC<ConversationItemProps> = ({
   username,
   onPress,
+  message,
+  date,
 }) => {
+  const hour = new Date(date).getHours();
+  const minutes = new Date(date).getMinutes();
   return (
     <div className={styles.conversationItemWrapper} onClick={onPress}>
       <img
@@ -69,18 +105,22 @@ const ConversationItem: React.FC<UserWithoutConversationProps> = ({
         alt={"avatar"}
       ></img>
       <div className={styles.nicknameText}>
-        <p className={styles.nickname}>{username}</p>
-        <p className={styles.textMessage}>
-          Text text text text text even more text;Text text text text text even
-          more text;Text text text text text even more text;
-        </p>
+        <div className={styles.usernameContainer}>
+          <p>{username}</p>
+          <p>
+            {hour}:{minutes}
+          </p>
+        </div>
+        <p className={styles.textMessage}>{message}</p>
       </div>
     </div>
   );
 };
 
-const SearchInput: React.FC<SearchInputProps> = (props: SearchInputProps) => {
-  const { searchQuery, setSearchQuery } = props;
+const SearchInput: React.FC<SearchInputProps> = ({
+  searchQuery,
+  setSearchQuery,
+}) => {
   return (
     <div className={styles.inputWrapper}>
       <input
